@@ -1,12 +1,11 @@
 package com.hx.spark.sql.connector.aof
 
 import com.hx.spark.sql.connector.aof.config.AOFReadConfig
-import com.hx.spark.sql.connector.aof.meta.{FileMeta, LaunchSnifferEndpoint, SnifferEndpointStatus}
-import com.hx.spark.sql.connector.aof.offset.{FileOffset, GlobalOffsets, OffsetBackupProvider, StartingOffsets}
-import com.hx.spark.sql.connector.aof.partition.{AOFPartitionReaderFactory, AOFSingleFilePartition}
-import com.hx.spark.sql.connector.aof.zookeeper.MetaCoordinator
+import com.hx.spark.sql.connector.aof.streaming.meta.{FileMeta, LaunchSnifferEndpoint, SnifferEndpointStatus}
+import com.hx.spark.sql.connector.aof.streaming.offset.{FileOffset, GlobalOffsets, OffsetBackupProvider, StartingOffsets}
+import com.hx.spark.sql.connector.aof.streaming.partition.{AOFPartitionReaderFactory, AOFSingleFilePartition}
+import com.hx.spark.sql.connector.aof.streaming.zookeeper.MetaCoordinator
 import com.hx.util.JsonSerializer
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.connector.read.streaming._
 import org.apache.spark.sql.connector.read.{InputPartition, PartitionReaderFactory}
 
@@ -29,13 +28,8 @@ private[aof] class AOFMicroBatchStream(config: AOFReadConfig) extends MicroBatch
   // 实例化Offset备份实现类
   private lazy val offsetStore = OffsetBackupProvider.getProvider(config.offsetBackupProviderClass, config)
 
-  private val sc = SparkSession.active.sparkContext
-
   // 启动时读取zookeeper中的offset备份
   private var finalOffset: GlobalOffsets = offsetStore.fetch().getOrElse(GlobalOffsets(config.directory, Map()))
-
-  // driver节点地址
-  private val driver = sc.getConf.get("spark.driver.host")
 
   final override def latestOffset(): Offset = {
     throw new UnsupportedOperationException(
@@ -97,7 +91,7 @@ private[aof] class AOFMicroBatchStream(config: AOFReadConfig) extends MicroBatch
     val startOffset = localStartOffsetCheck(localStartOffset)
     val maxBytes = limit.asInstanceOf[ReadMaxRows].maxRows()
     // 应用分配的所有executor
-    val offsets = sc.statusTracker.getExecutorInfos.map(_.host()).distinct.filterNot(_.equals(driver)).map { executor =>
+    val offsets = ApplicationInfo.executors.map { executor =>
       endpointStatusTracer.getOrElse(executor, SnifferEndpointStatus.Unknown) match {
         // executor上元数据服务已启动
         case SnifferEndpointStatus.Running =>
@@ -169,14 +163,14 @@ private[aof] class AOFMicroBatchStream(config: AOFReadConfig) extends MicroBatch
    * 为不同节点的文件创建分区
    *
    * @param start 起始偏移量
-   * @param end 终止偏移量
+   * @param end   终止偏移量
    * @return 节点的分区信息
    */
   override def planInputPartitions(start: Offset, end: Offset): Array[InputPartition] = {
     val startOffsets = start.asInstanceOf[GlobalOffsets]
     val endOffsets = end.asInstanceOf[GlobalOffsets]
     endOffsets.offsets.toArray.flatMap {
-          // 如果节点的元数据服务已启动,则节点能够读取数据,为其创建分区
+      // 如果节点的元数据服务已启动,则节点能够读取数据,为其创建分区
       case (node, offsets) if endpointStatusTracer.getOrElse(node, SnifferEndpointStatus.Unknown).equals(SnifferEndpointStatus.Running) =>
         logger.debug(s"Planning file partitions from start offset ${startOffsets.offsets.getOrElse(node, Map())} to end offset $offsets for $node")
         offsets.toArray.map {
@@ -188,7 +182,7 @@ private[aof] class AOFMicroBatchStream(config: AOFReadConfig) extends MicroBatch
             val rectifiedStart = if (start > end.offset) end.offset else start
             AOFSingleFilePartition(node, s"${config.directory}/$name", rectifiedStart, end.offset)
         }.asInstanceOf[Array[InputPartition]]
-        // 如果节点的元数据服务未启动,则创建由于启动元数据服务的分区
+      // 如果节点的元数据服务未启动,则创建由于启动元数据服务的分区
       case (node, _) =>
         // 记录节点的元数据服务状态为Unknown
         endpointStatusTracer.put(node, SnifferEndpointStatus.Unknown)

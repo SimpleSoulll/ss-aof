@@ -25,7 +25,7 @@ private[aof] class DefaultSource extends TableProvider with DataSourceRegister {
 
     config.validate()
 
-    new AOFStreamingTable(_schema, config)
+    new AOFTable(_schema, config)
   }
 
   override def supportsExternalMetadata(): Boolean = false

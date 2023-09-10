@@ -1,7 +1,7 @@
-package com.hx.spark.sql.connector.aof.zookeeper
+package com.hx.spark.sql.connector.aof.streaming.zookeeper
 
-import com.hx.spark.sql.connector.aof.meta.{FileMeta, SnifferEndpointStatus}
-import com.hx.spark.sql.connector.aof.zookeeper.message.{DirectoryMetaSnifferMessage, MetaSnifferRequestMessage}
+import com.hx.spark.sql.connector.aof.streaming.meta.{FileMeta, SnifferEndpointStatus}
+import com.hx.spark.sql.connector.aof.streaming.zookeeper.message.{DirectoryMetaSnifferMessage, MetaSnifferRequestMessage}
 import com.hx.spark.sql.connector.aof.{AOFReadException, Logging}
 import com.hx.util.JsonSerializer
 import org.apache.curator.framework.CuratorFrameworkFactory

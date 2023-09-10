@@ -1,4 +1,4 @@
-package com.hx.spark.sql.connector.aof.offset
+package com.hx.spark.sql.connector.aof.streaming.offset
 
 import com.hx.util.JsonSerializer
 import org.apache.spark.sql.connector.read.streaming.Offset

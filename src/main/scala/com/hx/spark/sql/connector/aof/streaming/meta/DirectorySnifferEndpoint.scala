@@ -1,7 +1,7 @@
-package com.hx.spark.sql.connector.aof.meta
+package com.hx.spark.sql.connector.aof.streaming.meta
 
 import com.hx.spark.sql.connector.aof.Logging
-import com.hx.spark.sql.connector.aof.zookeeper.message.{DirectoryMetaSnifferMessage, MetaSnifferRequestMessage}
+import com.hx.spark.sql.connector.aof.streaming.zookeeper.message.{DirectoryMetaSnifferMessage, MetaSnifferRequestMessage}
 import com.hx.util.JsonSerializer
 import org.apache.curator.framework.CuratorFrameworkFactory
 import org.apache.curator.framework.recipes.cache.NodeCache

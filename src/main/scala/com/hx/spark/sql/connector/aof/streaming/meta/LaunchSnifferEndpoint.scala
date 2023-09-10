@@ -1,4 +1,4 @@
-package com.hx.spark.sql.connector.aof.meta
+package com.hx.spark.sql.connector.aof.streaming.meta
 
 import org.apache.spark.sql.connector.read.InputPartition
 
@@ -19,7 +19,7 @@ private[aof] case class LaunchSnifferEndpoint(node: String, directory: String, p
   /**
    * 分区将被优先发送给preferredLocations,但是Spark不保证一定能够发送至node指定的节点(即保证NODE_LOCAL本地行)。
    * 如果数据没有发送至node指定节点(数据本地性降级),这将导致driver端接受的文件元数据紊乱,即drier接受到A节点的元数据实际上出自B节点
-   * [[DirectorySnifferEndpoint]]及[[com.hx.spark.sql.connector.aof.partition.AOFPartitionReader]]实现数据本地行校验逻辑,以避免上述问题。
+   * [[DirectorySnifferEndpoint]]及[[com.hx.spark.sql.connector.aof.streaming.partition.AOFPartitionReader]]实现数据本地行校验逻辑,以避免上述问题。
    * `spark.locality.wait.node`是driver成功将InputPartition发送至指定executor的最大超时时间,因此在网络环境恶劣时可以增大该参数，避免数据本地性降级。
    */
   override def preferredLocations(): Array[String] = Array(node)

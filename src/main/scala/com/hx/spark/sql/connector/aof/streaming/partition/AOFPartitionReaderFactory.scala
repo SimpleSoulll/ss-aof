@@ -1,7 +1,7 @@
-package com.hx.spark.sql.connector.aof.partition
+package com.hx.spark.sql.connector.aof.streaming.partition
 
 import com.hx.spark.sql.connector.aof.Logging
-import com.hx.spark.sql.connector.aof.meta.{DirectorySnifferEndpoint, LaunchSnifferEndpoint}
+import com.hx.spark.sql.connector.aof.streaming.meta.{DirectorySnifferEndpoint, LaunchSnifferEndpoint}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.connector.read.{InputPartition, PartitionReader, PartitionReaderFactory}
 

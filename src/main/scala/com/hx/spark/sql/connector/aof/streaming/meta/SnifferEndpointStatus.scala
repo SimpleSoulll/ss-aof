@@ -1,4 +1,4 @@
-package com.hx.spark.sql.connector.aof.meta
+package com.hx.spark.sql.connector.aof.streaming.meta
 
 /**
  * executor端文件元数据采集进程的状态

@@ -1,4 +1,4 @@
-package com.hx.spark.sql.connector.aof.meta
+package com.hx.spark.sql.connector.aof.streaming.meta
 
 /**
  * 文件元数据

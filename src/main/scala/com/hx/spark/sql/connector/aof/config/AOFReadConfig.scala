@@ -1,7 +1,7 @@
 package com.hx.spark.sql.connector.aof.config
 
-import com.hx.spark.sql.connector.aof.offset.StartingOffsets
-import com.hx.spark.sql.connector.aof.zookeeper.OffsetStore
+import com.hx.spark.sql.connector.aof.streaming.offset.StartingOffsets
+import com.hx.spark.sql.connector.aof.streaming.zookeeper.OffsetStore
 import com.hx.spark.sql.connector.aof.{AOFReadException, Logging}
 
 import java.util.regex.Pattern
